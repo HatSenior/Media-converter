@@ -46,6 +46,13 @@
     <Style x:Key="HistoryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="Padding" Value="0"/>
     </Style>
+    <Style x:Key="ToolTabButton" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Padding" Value="13,8"/><Setter Property="FontSize" Value="12"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Height" Value="39"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Grid Background="Transparent"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/><Border x:Name="TabIndicator" Height="2" CornerRadius="1" Background="{DynamicResource PrimaryBrush}" VerticalAlignment="Bottom" Margin="8,0" Opacity="0"/></Grid><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Trigger><Trigger Property="Tag" Value="Active"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/><Setter Property="FontWeight" Value="SemiBold"/><Setter TargetName="TabIndicator" Property="Opacity" Value="1"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource QuietButton}">
+      <Setter Property="Padding" Value="11,6"/><Setter Property="Margin" Value="0,0,5,0"/><Setter Property="FontSize" Value="12"/>
+    </Style>
     <Style x:Key="ThemeComboStyle" TargetType="ComboBox">
       <Setter Property="Background" Value="{DynamicResource CardBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Padding" Value="7,4"/>
       <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ComboBox"><Grid><ToggleButton x:Name="ThemeToggle" IsChecked="{Binding IsDropDownOpen,RelativeSource={RelativeSource TemplatedParent},Mode=TwoWay}" Background="Transparent" BorderThickness="0"><ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="{Binding Background,RelativeSource={RelativeSource AncestorType=ComboBox}}" BorderBrush="{Binding BorderBrush,RelativeSource={RelativeSource AncestorType=ComboBox}}" BorderThickness="{Binding BorderThickness,RelativeSource={RelativeSource AncestorType=ComboBox}}" CornerRadius="9" Padding="7,4"><Grid><ContentPresenter Content="{Binding SelectedItem,RelativeSource={RelativeSource AncestorType=ComboBox}}" ContentTemplate="{Binding ItemTemplate,RelativeSource={RelativeSource AncestorType=ComboBox}}" HorizontalAlignment="Left"/><Path Data="M1,2 L5,6 L9,2" Stroke="{DynamicResource MutedBrush}" StrokeThickness="1.3" Width="9" Height="6" HorizontalAlignment="Right" VerticalAlignment="Center"/></Grid></Border></ControlTemplate></ToggleButton.Template></ToggleButton><Popup x:Name="PART_Popup" IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" PlacementTarget="{Binding ElementName=ThemeToggle}" AllowsTransparency="True" PopupAnimation="Fade"><Border Width="82" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="10" Padding="5" Margin="0,4,0,0"><ItemsPresenter/></Border></Popup></Grid></ControlTemplate></Setter.Value></Setter>
@@ -60,6 +67,18 @@
       <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
       <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/><Setter Property="BorderThickness" Value="1"/>
       <Setter Property="Padding" Value="12,10"/><Setter Property="FontSize" Value="14"/>
+    </Style>
+    <Style TargetType="Slider">
+      <Setter Property="Height" Value="24"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Slider"><Grid Background="Transparent"><Track x:Name="PART_Track" Height="16" VerticalAlignment="Center">
+        <Track.DecreaseRepeatButton><RepeatButton Command="{x:Static Slider.DecreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="4" Background="{DynamicResource AccentBrush}" CornerRadius="2" VerticalAlignment="Center"/></ControlTemplate></RepeatButton.Template></RepeatButton></Track.DecreaseRepeatButton>
+        <Track.Thumb><Thumb Width="16" Height="16"><Thumb.Template><ControlTemplate TargetType="Thumb"><Grid><Ellipse x:Name="SliderThumb" Fill="{DynamicResource SurfaceBrush}" Stroke="{DynamicResource PrimaryBrush}" StrokeThickness="2"/><Ellipse Width="5" Height="5" Fill="{DynamicResource PrimaryBrush}"/></Grid><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="SliderThumb" Property="Fill" Value="{DynamicResource SoftBrush}"/></Trigger><Trigger Property="IsDragging" Value="True"><Setter TargetName="SliderThumb" Property="Fill" Value="{DynamicResource PrimaryBrush}"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+        <Track.IncreaseRepeatButton><RepeatButton Command="{x:Static Slider.IncreaseLarge}" Focusable="False"><RepeatButton.Template><ControlTemplate TargetType="RepeatButton"><Border Height="4" Background="{DynamicResource BorderBrush}" CornerRadius="2" VerticalAlignment="Center"/></ControlTemplate></RepeatButton.Template></RepeatButton></Track.IncreaseRepeatButton>
+      </Track></Grid></ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style TargetType="CheckBox">
+      <Setter Property="Foreground" Value="{DynamicResource MutedBrush}"/><Setter Property="Cursor" Value="Hand"/><Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox"><Grid Background="Transparent"><Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Border x:Name="CheckSurface" Width="17" Height="17" CornerRadius="5" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1"><Path x:Name="CheckMark" Data="M3,7 L6.2,10 L12,4" Stroke="{DynamicResource OnPrimaryBrush}" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Visibility="Collapsed"/></Border><ContentPresenter Grid.Column="1" Margin="7,0,0,0" VerticalAlignment="Center"/></Grid><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="CheckSurface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger><Trigger Property="IsChecked" Value="True"><Setter TargetName="CheckSurface" Property="Background" Value="{DynamicResource PrimaryBrush}"/><Setter TargetName="CheckSurface" Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/><Setter TargetName="CheckMark" Property="Visibility" Value="Visible"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.42"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
     </Style>
     <Style x:Key="CustomScrollBar" TargetType="ScrollBar">
       <Setter Property="Width" Value="11"/><Setter Property="Margin" Value="4,2,1,2"/><Setter Property="Background" Value="Transparent"/>
@@ -122,6 +141,7 @@
               </Trigger>
               <DataTrigger Binding="{Binding IsFolder}" Value="True"><Setter TargetName="Arrow" Property="Visibility" Value="Visible"/></DataTrigger>
               <DataTrigger Binding="{Binding IsFolder}" Value="True"><Setter Property="Width" Value="982"/></DataTrigger>
+              <DataTrigger Binding="{Binding IsToolVisible}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger>
               <Trigger Property="IsExpanded" Value="False"><Setter TargetName="ChildrenLine" Property="Visibility" Value="Collapsed"/></Trigger>
               <Trigger Property="IsExpanded" Value="True">
                 <Setter TargetName="ChildrenLine" Property="Opacity" Value="1"/>
@@ -143,9 +163,12 @@
     <Grid>
       <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
         <TextBlock Text="Media Forge" FontSize="25" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}"/>
-        <TextBlock x:Name="TaglineText" Text=" — media converter" FontSize="16" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Bottom" Margin="3,0,0,3"/>
+        <TextBlock x:Name="TaglineText" Visibility="Collapsed"/>
       </StackPanel>
-      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Opacity="0.7">
+      <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+        <StackPanel Orientation="Horizontal"><Button x:Name="ConvertTab" Content="Convert" Style="{StaticResource ToolTabButton}"/><Button x:Name="CompressTab" Content="Compress" Style="{StaticResource ToolTabButton}"/><Button x:Name="VideoTab" Content="Video" Style="{StaticResource ToolTabButton}"/><Button x:Name="AudioTab" Content="Audio" Style="{StaticResource ToolTabButton}"/><Button x:Name="FrameTab" Content="Frame" Style="{StaticResource ToolTabButton}"/></StackPanel>
+      </Border>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Opacity="0.62">
         <TextBlock Text="Ctrl+Z" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
         <TextBlock Text="  ·  Ctrl+X" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
       </StackPanel>
@@ -153,16 +176,50 @@
 
     <Border Grid.Row="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="16" Padding="18,16">
       <Grid>
-        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="Auto"/><RowDefinition Height="10"/><RowDefinition Height="*"/></Grid.RowDefinitions>
         <Grid Margin="12,0"><TextBlock x:Name="FilesCaption" Text="Перетащите медиа" FontSize="11" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right"><Button x:Name="UndoButton" Width="30" Height="32" Style="{StaticResource HistoryButton}" ToolTip="Отменить"><Path Data="M11,3 L5,8 L11,13 M5,8 L14,8 C19,8 21,11 21,15" Stroke="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="21" Height="16" Stretch="Uniform"/></Button><Button x:Name="RedoButton" Width="30" Height="32" Style="{StaticResource HistoryButton}" ToolTip="Повторить" Margin="2,0,10,0"><Path Data="M10,3 L16,8 L10,13 M16,8 L7,8 C2,8 0,11 0,15" Stroke="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Width="21" Height="16" Stretch="Uniform"/></Button><Button x:Name="AddMoreButton" MinWidth="124" Height="34" Padding="14,0" ToolTip="Добавить ещё файлы"><StackPanel Orientation="Horizontal"><TextBlock Text="＋" FontSize="17" Margin="0,-1,7,0"/><TextBlock x:Name="AddMoreText" Text="Add media" FontWeight="SemiBold" VerticalAlignment="Center"/></StackPanel></Button></StackPanel></Grid>
-        <Grid Grid.Row="2" x:Name="ListSurface" Background="Transparent" AllowDrop="True">
+        <Border x:Name="ToolSettingsHost" Grid.Row="2" Background="{DynamicResource CardBrush}" CornerRadius="12" Padding="14,11" Visibility="Collapsed">
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <StackPanel x:Name="CompressPanel" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+              <TextBlock Text="Target size" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,10,0"/>
+              <Button x:Name="Compress10Button" Content="10 MB" Style="{StaticResource ChipButton}"/><Button x:Name="Compress25Button" Content="25 MB" Style="{StaticResource ChipButton}"/><Button x:Name="Compress50Button" Content="50 MB" Style="{StaticResource ChipButton}"/><Button x:Name="Compress100Button" Content="100 MB" Style="{StaticResource ChipButton}"/>
+              <TextBox x:Name="TargetSizeBox" Text="25" Width="58" Padding="8,6" Margin="2,0,4,0"/><TextBlock Text="MB" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,18,0"/>
+              <TextBlock Text="Compression level" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,7,0"/><ComboBox x:Name="CompressionLevelPicker" Width="104" Style="{StaticResource UtilityComboStyle}"/>
+            </StackPanel>
+            <StackPanel x:Name="VideoPanel" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+              <TextBlock Text="Resolution" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,6,0"/><ComboBox x:Name="ResolutionPicker" Width="100" Style="{StaticResource UtilityComboStyle}" Margin="0,0,10,0"/>
+              <StackPanel x:Name="CustomResolutionPanel" Orientation="Horizontal" Visibility="Collapsed"><TextBox x:Name="CustomWidthBox" Text="1920" Width="58" Padding="7,5"/><TextBlock Text=" × " VerticalAlignment="Center"/><TextBox x:Name="CustomHeightBox" Text="1080" Width="58" Padding="7,5" Margin="0,0,8,0"/></StackPanel>
+              <CheckBox x:Name="KeepAspectCheck" Content="Keep ratio" IsChecked="True" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,14,0"/>
+              <TextBlock Text="FPS" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,5,0"/><ComboBox x:Name="FpsPicker" Width="82" Style="{StaticResource UtilityComboStyle}" Margin="0,0,5,0"/><TextBox x:Name="CustomFpsBox" Text="30" Width="46" Padding="7,5" Visibility="Collapsed" Margin="0,0,9,0"/>
+              <TextBlock Text="Speed" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,6,0"/><Slider x:Name="SpeedSlider" Width="118" Minimum="0.25" Maximum="2" Value="1" TickFrequency="0.25" IsSnapToTickEnabled="True"/><TextBlock x:Name="SpeedValueText" Text="1×" Width="38" VerticalAlignment="Center" Margin="7,0,10,0"/>
+              <CheckBox x:Name="RemoveAudioCheck" Content="Remove audio" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}"/>
+            </StackPanel>
+            <StackPanel x:Name="AudioPanel" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+              <TextBlock Text="Action" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,6,0"/><ComboBox x:Name="AudioModePicker" Width="132" Style="{StaticResource UtilityComboStyle}" Margin="0,0,12,0"/>
+              <TextBlock Text="Format" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,5,0"/><ComboBox x:Name="AudioFormatPicker" Width="78" Style="{StaticResource UtilityComboStyle}" Margin="0,0,12,0"/>
+              <TextBlock Text="Quality" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,5,0"/><ComboBox x:Name="AudioQualityPicker" Width="104" Style="{StaticResource UtilityComboStyle}" Margin="0,0,14,0"/>
+              <TextBlock Text="Volume" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,6,0"/><Slider x:Name="VolumeSlider" Width="125" Minimum="0" Maximum="2" Value="1" TickFrequency="0.25" IsSnapToTickEnabled="True"/><TextBlock x:Name="VolumeValueText" Text="100%" Width="42" VerticalAlignment="Center" Margin="7,0,10,0"/>
+              <CheckBox x:Name="NormalizeCheck" Content="Normalize" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,12,0"/>
+              <Expander Header="Advanced" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center"><StackPanel Orientation="Horizontal" Margin="8,0,0,0"><TextBox x:Name="AudioBitrateBox" Text="0" Width="48" Padding="6,4" ToolTip="0 = automatic"/><TextBlock Text=" kbps" VerticalAlignment="Center" FontSize="11"/></StackPanel></Expander>
+            </StackPanel>
+            <StackPanel x:Name="FramePanel" Orientation="Horizontal" VerticalAlignment="Center" Visibility="Collapsed">
+              <Border x:Name="FramePreview" Width="80" Height="45" CornerRadius="7" Background="{DynamicResource SoftBrush}" Margin="0,0,10,0"/>
+              <TextBlock Text="Frame at" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0"/><Slider x:Name="FrameTimeline" Width="150" Minimum="0" Maximum="100" Value="0" Margin="0,0,10,0"/><TextBox x:Name="FrameTimestampBox" Text="00:00:00.000" Width="112" Padding="8,6" Margin="0,0,14,0"/>
+              <TextBlock Text="Format" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,5,0"/><ComboBox x:Name="FrameFormatPicker" Width="76" Style="{StaticResource UtilityComboStyle}" Margin="0,0,14,0"/>
+              <TextBlock Text="Quality" VerticalAlignment="Center" Foreground="{DynamicResource MutedBrush}" Margin="0,0,7,0"/><Slider x:Name="FrameQualitySlider" Width="150" Minimum="10" Maximum="100" Value="90" TickFrequency="5" IsSnapToTickEnabled="True"/><TextBlock x:Name="FrameQualityText" Text="90%" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="Applies to all" FontSize="10" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+          </Grid>
+        </Border>
+        <Grid Grid.Row="4" x:Name="ListSurface" Background="Transparent" AllowDrop="True">
           <TreeView x:Name="FileList" BorderThickness="0" Background="Transparent"
                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.PanningMode="VerticalOnly" ScrollViewer.CanContentScroll="False" ItemContainerStyle="{StaticResource TreeItemStyle}">
             <TreeView.Resources><Style TargetType="ScrollBar" BasedOn="{StaticResource CustomScrollBar}"/></TreeView.Resources>
             <TreeView.ItemsPanel><ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate></TreeView.ItemsPanel>
             <TreeView.ItemTemplate>
               <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                 <Border x:Name="RowSurface" CornerRadius="11" Padding="8,6" MinHeight="96" BorderBrush="Transparent" BorderThickness="1" HorizontalAlignment="Stretch" ToolTip="{Binding Name}">
+                 <Border x:Name="RowSurface" CornerRadius="11" Padding="8,6" MinHeight="118" BorderBrush="Transparent" BorderThickness="1" HorizontalAlignment="Stretch" ToolTip="{Binding Name}">
                   <Border.Style>
                     <Style TargetType="Border">
                       <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
@@ -175,11 +232,13 @@
                       </Style.Triggers>
                     </Style>
                   </Border.Style>
-                  <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition x:Name="ThumbColumn" Width="92"/><ColumnDefinition Width="*"/><ColumnDefinition Width="40"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions>
-                    <Border x:Name="SelectionIndicator" Width="3" Height="28" CornerRadius="2" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"/>
-                    <TextBlock Text="{Binding Number}" FontSize="12" FontWeight="SemiBold" Foreground="#999993" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <Border x:Name="ThumbBg" Grid.Column="1" Width="80" Height="80" CornerRadius="14" Background="{DynamicResource SoftBrush}" ClipToBounds="True">
+                   <Grid>
+                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+                     <Grid.ColumnDefinitions><ColumnDefinition Width="30"/><ColumnDefinition x:Name="ThumbColumn" Width="92"/><ColumnDefinition Width="*"/><ColumnDefinition Width="32"/><ColumnDefinition Width="40"/><ColumnDefinition Width="40"/></Grid.ColumnDefinitions>
+                     <Border x:Name="SelectionIndicator" Grid.RowSpan="2" Width="3" Height="28" CornerRadius="2" Background="{DynamicResource AccentBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="Collapsed"/>
+                     <TextBlock Grid.ColumnSpan="6" Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}" Margin="32,2,8,9"/>
+                     <TextBlock Grid.Row="1" Text="{Binding Number}" FontSize="12" FontWeight="SemiBold" Foreground="#999993" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                     <Border x:Name="ThumbBg" Grid.Row="1" Grid.Column="1" Width="80" Height="80" CornerRadius="14" Background="{DynamicResource SoftBrush}" ClipToBounds="True">
                       <Grid>
                         <Border x:Name="PreviewImage" CornerRadius="14"><Border.Background><ImageBrush ImageSource="{Binding Thumbnail}" Stretch="UniformToFill"/></Border.Background></Border>
                         <Path x:Name="FileIcon" Data="M3,1 L11,1 L15,5 L15,17 L3,17 Z M11,1 L11,5 L15,5" Stroke="{DynamicResource TextBrush}" StrokeThickness="1.3" Width="34" Height="34" Stretch="Uniform" Margin="8"/>
@@ -189,10 +248,9 @@
                         <Viewbox x:Name="AudioWave3" Visibility="Collapsed" Margin="12"><Path Data="M0,15 L5,15 L9,3 L13,26 L17,13 L21,18 L25,8 L29,22 L33,5 L37,25 L41,15 L46,15" Stroke="#4B4B46" StrokeThickness="2.2" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/></Viewbox>
                       </Grid>
                     </Border>
-                    <Grid Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0">
-                      <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"/>
-                      <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+                     <Grid Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,10,0">
+                       <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                       <StackPanel Orientation="Horizontal">
                         <TextBlock Text="{Binding Details}" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
                         <TextBlock x:Name="FormatSeparator" Text="  ·  " FontSize="11" Foreground="{DynamicResource BorderBrush}"/>
                         <TextBlock x:Name="FormatText" Text="{Binding Extension}" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
@@ -201,9 +259,11 @@
                         <TextBlock x:Name="SizeSeparator" Text="  ·  " FontSize="11" Foreground="{DynamicResource BorderBrush}"/>
                         <TextBlock x:Name="SizeText" Text="{Binding Size}" FontSize="11" Foreground="{DynamicResource MutedBrush}"/>
                       </StackPanel>
-                    </Grid>
-                    <Button x:Name="FolderAddButton" Grid.Column="3" Visibility="Collapsed" Width="34" Height="34" Style="{StaticResource HistoryButton}" ToolTip="{Binding AddToFolderTooltip}"><TextBlock Text="＋" FontSize="20"/></Button>
-                    <Button x:Name="RowDeleteButton" Grid.Column="4" Width="34" Height="34" Style="{StaticResource TrashButton}" ToolTip="{Binding DeleteTooltip}"><Viewbox Width="15" Height="16"><Path Data="M3,5 L15,5 M6,5 L6,3 L12,3 L12,5 M5,7 L5.7,17 L12.3,17 L13,7 M8,8.5 L8,14.5 M10,8.5 L10,14.5" Stroke="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/></Viewbox></Button>
+                       <Grid Grid.Row="1" Margin="0,8,0,0"><ProgressBar Height="2" Minimum="0" Maximum="100" Value="{Binding Progress}" Background="{DynamicResource SoftBrush}" Foreground="{DynamicResource AccentBrush}"/><StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,3,0,0"><TextBlock Text="{Binding ProcessStatus}" FontSize="10" Foreground="{DynamicResource MutedBrush}"/><TextBlock Text="{Binding ResultSize}" FontSize="10" Foreground="{DynamicResource MutedBrush}" Margin="7,0,0,0"/></StackPanel></Grid>
+                     </Grid>
+                     <Button x:Name="FileInfoButton" Grid.Row="1" Grid.Column="3" Width="28" Height="28" Style="{StaticResource HistoryButton}" ToolTip="File info"><TextBlock Text="i" FontSize="12" FontWeight="SemiBold"/></Button>
+                     <Button x:Name="FolderAddButton" Grid.Row="1" Grid.Column="4" Visibility="Collapsed" Width="34" Height="34" Style="{StaticResource HistoryButton}" ToolTip="{Binding AddToFolderTooltip}"><TextBlock Text="＋" FontSize="20"/></Button>
+                     <Button x:Name="RowDeleteButton" Grid.Row="1" Grid.Column="5" Width="34" Height="34" Style="{StaticResource TrashButton}" ToolTip="{Binding DeleteTooltip}"><Viewbox Width="15" Height="16"><Path Data="M3,5 L15,5 M6,5 L6,3 L12,3 L12,5 M5,7 L5.7,17 L12.3,17 L13,7 M8,8.5 L8,14.5 M10,8.5 L10,14.5" Stroke="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/></Viewbox></Button>
                   </Grid>
                 </Border>
                 <HierarchicalDataTemplate.Triggers>
@@ -215,13 +275,14 @@
                   <MultiDataTrigger><MultiDataTrigger.Conditions><Condition Binding="{Binding IsAudio}" Value="True"/><Condition Binding="{Binding AudioVariant}" Value="3"/></MultiDataTrigger.Conditions><Setter TargetName="FileIcon" Property="Visibility" Value="Collapsed"/><Setter TargetName="AudioWave3" Property="Visibility" Value="Visible"/></MultiDataTrigger>
                   <DataTrigger Binding="{Binding IsSelected,RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True"><Setter TargetName="SelectionIndicator" Property="Visibility" Value="Visible"/></DataTrigger>
                   <DataTrigger Binding="{Binding IsMarked}" Value="True"><Setter TargetName="SelectionIndicator" Property="Visibility" Value="Visible"/></DataTrigger>
-                  <DataTrigger Binding="{Binding IsFolder}" Value="True"><Setter TargetName="RowSurface" Property="MinHeight" Value="64"/><Setter TargetName="ThumbColumn" Property="Width" Value="54"/><Setter TargetName="PreviewImage" Property="Visibility" Value="Collapsed"/><Setter TargetName="FileIcon" Property="Data" Value="M2.5,5.5 L7.2,5.5 L9.2,7.5 L17.5,7.5 L17.5,15.5 L2.5,15.5 Z"/><Setter TargetName="FileIcon" Property="Width" Value="25"/><Setter TargetName="FileIcon" Property="Height" Value="22"/><Setter TargetName="FileIcon" Property="Margin" Value="8"/><Setter TargetName="ThumbBg" Property="Width" Value="38"/><Setter TargetName="ThumbBg" Property="Height" Value="38"/><Setter TargetName="ThumbBg" Property="CornerRadius" Value="9"/><Setter TargetName="ThumbBg" Property="Background" Value="{DynamicResource SoftBrush}"/><Setter TargetName="FormatSeparator" Property="Visibility" Value="Collapsed"/><Setter TargetName="FormatText" Property="Visibility" Value="Collapsed"/><Setter TargetName="SizeSeparator" Property="Visibility" Value="Collapsed"/><Setter TargetName="SizeText" Property="Visibility" Value="Collapsed"/><Setter TargetName="FolderAddButton" Property="Visibility" Value="Visible"/></DataTrigger>
+                  <DataTrigger Binding="{Binding IsFolder}" Value="True"><Setter TargetName="RowSurface" Property="MinHeight" Value="64"/><Setter TargetName="ThumbColumn" Property="Width" Value="54"/><Setter TargetName="PreviewImage" Property="Visibility" Value="Collapsed"/><Setter TargetName="FileIcon" Property="Data" Value="M2.5,5.5 L7.2,5.5 L9.2,7.5 L17.5,7.5 L17.5,15.5 L2.5,15.5 Z"/><Setter TargetName="FileIcon" Property="Width" Value="25"/><Setter TargetName="FileIcon" Property="Height" Value="22"/><Setter TargetName="FileIcon" Property="Margin" Value="8"/><Setter TargetName="ThumbBg" Property="Width" Value="38"/><Setter TargetName="ThumbBg" Property="Height" Value="38"/><Setter TargetName="ThumbBg" Property="CornerRadius" Value="9"/><Setter TargetName="ThumbBg" Property="Background" Value="{DynamicResource SoftBrush}"/><Setter TargetName="FormatSeparator" Property="Visibility" Value="Collapsed"/><Setter TargetName="FormatText" Property="Visibility" Value="Collapsed"/><Setter TargetName="SizeSeparator" Property="Visibility" Value="Collapsed"/><Setter TargetName="SizeText" Property="Visibility" Value="Collapsed"/><Setter TargetName="FileInfoButton" Property="Visibility" Value="Collapsed"/><Setter TargetName="FolderAddButton" Property="Visibility" Value="Visible"/></DataTrigger>
                 </HierarchicalDataTemplate.Triggers>
               </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
           </TreeView>
           <ScrollViewer x:Name="GalleryView" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly">
             <ItemsControl x:Name="GalleryItems">
+              <ItemsControl.ItemContainerStyle><Style TargetType="ContentPresenter"><Style.Triggers><DataTrigger Binding="{Binding IsToolVisible}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></ItemsControl.ItemContainerStyle>
               <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
               <ItemsControl.ItemTemplate><DataTemplate><Border Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="14" Margin="6" Padding="9"><Grid><Grid.RowDefinitions><RowDefinition Height="150"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Border CornerRadius="11" Background="{DynamicResource SoftBrush}" ClipToBounds="True"><Grid><Border><Border.Background><ImageBrush ImageSource="{Binding Thumbnail}" Stretch="UniformToFill"/></Border.Background></Border><TextBlock Text="{Binding CategoryDisplay}" Foreground="{DynamicResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/></Grid></Border><Button x:Name="GalleryDeleteButton" Width="31" Height="31" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource TrashButton}" ToolTip="{Binding DeleteTooltip}"><Viewbox Width="14" Height="15"><Path Data="M3,5 L15,5 M6,5 L6,3 L12,3 L12,5 M5,7 L5.7,17 L12.3,17 L13,7 M8,8.5 L8,14.5 M10,8.5 L10,14.5" Stroke="{Binding Foreground,RelativeSource={RelativeSource AncestorType=Button}}" StrokeThickness="1.35"/></Viewbox></Button><StackPanel Grid.Row="1" Margin="2,9,2,2"><TextBlock Text="{Binding TypeLine}" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding FormatLine}" Margin="0,3,0,0" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding NameLine}" Margin="0,3,0,0" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/></StackPanel></Grid></Border></DataTemplate></ItemsControl.ItemTemplate>
             </ItemsControl>

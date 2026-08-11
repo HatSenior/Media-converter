@@ -1,13 +1,18 @@
 $window = [Windows.Markup.XamlReader]::Load((New-Object System.Xml.XmlNodeReader $xaml))
-foreach($name in 'FileList','GalleryView','GalleryItems','ViewPicker','ListSurface','EmptyAddButton','EmptyAddText','AddMoreButton','AddMoreText','UndoButton','RedoButton','ActionPanel','FolderButton','FolderButtonText','RenameButton','ConversionExpander','ConversionHeaderText','ConversionList','ConversionScrollViewer','BulkPanel','GlobalImagePanel','GlobalVideoPanel','GlobalAudioPanel','GlobalImageLabel','GlobalVideoLabel','GlobalAudioLabel','GlobalImagePicker','GlobalVideoPicker','GlobalAudioPicker','StatusText','ConvertButton','TaglineText','FilesCaption','ThemeCaption','LanguageCaption','ThemePicker','LanguagePicker') {
+foreach($name in 'FileList','GalleryView','GalleryItems','ViewPicker','ListSurface','EmptyAddButton','EmptyAddText','AddMoreButton','AddMoreText','UndoButton','RedoButton','ActionPanel','FolderButton','FolderButtonText','RenameButton','ConversionExpander','ConversionHeaderText','ConversionList','ConversionScrollViewer','BulkPanel','GlobalImagePanel','GlobalVideoPanel','GlobalAudioPanel','GlobalImageLabel','GlobalVideoLabel','GlobalAudioLabel','GlobalImagePicker','GlobalVideoPicker','GlobalAudioPicker','StatusText','ConvertButton','TaglineText','FilesCaption','ThemeCaption','LanguageCaption','ThemePicker','LanguagePicker','ConvertTab','CompressTab','VideoTab','AudioTab','FrameTab','ToolSettingsHost','CompressPanel','VideoPanel','AudioPanel','FramePanel','Compress10Button','Compress25Button','Compress50Button','Compress100Button','TargetSizeBox','CompressionLevelPicker','ResolutionPicker','CustomResolutionPanel','CustomWidthBox','CustomHeightBox','KeepAspectCheck','FpsPicker','CustomFpsBox','SpeedSlider','SpeedValueText','RemoveAudioCheck','AudioModePicker','AudioFormatPicker','AudioQualityPicker','VolumeSlider','VolumeValueText','NormalizeCheck','AudioBitrateBox','FramePreview','FrameTimeline','FrameTimestampBox','FrameFormatPicker','FrameQualitySlider','FrameQualityText') {
     Set-Variable $name $window.FindName($name)
 }
 
 $appRoot = if($env:MEDIAFORGE_ROOT){$env:MEDIAFORGE_ROOT.TrimEnd('\')}else{(Get-Location).Path}
+$enginePath = Join-Path $appRoot 'MediaForgeEngine.ps1'
+if(Test-Path -LiteralPath $enginePath){. ([scriptblock]::Create([IO.File]::ReadAllText($enginePath,[Text.Encoding]::UTF8)))}
+$script:hardwareEncoders=if(Get-Command Get-AvailableHardwareEncoders -ErrorAction SilentlyContinue){@(Get-AvailableHardwareEncoders)}else{@()}
 $settingsPath = Join-Path $appRoot 'mediaforge-settings.json'
 $script:language = 'ru'
 $script:theme = 'mono'
 $script:viewMode = 'list'
+$script:activeTool = 'convert'
+$script:compressionMode = 'target'
 $script:updatingPreferences = $false
 
 $script:i18n = @{
@@ -29,9 +34,12 @@ $script:themes = [ordered]@{
     editorial=@{Window='#FFF9F7';Surface='#FFFFFF';Card='#FFF0F2';Soft='#E9D7CE';Hover='#F6DDE3';Selected='#EAB8C2';Primary='#7B292C';OnPrimary='#FFFDFC';Text='#38211D';Muted='#85675E';Border='#D8B9AF';Accent='#B94F5B';Folder='#F4D5DC'}
     grove=@{Window='#F1EBDD';Surface='#FFFDF5';Card='#F5F0DF';Soft='#DCE3C9';Hover='#CED9B7';Selected='#B8C99A';Primary='#36533C';OnPrimary='#FFFDF5';Text='#28362A';Muted='#65705E';Border='#BBC4A9';Accent='#76945E';Folder='#DCE3C9'}
     cobalt=@{Window='#EEF5FF';Surface='#FFFFFF';Card='#F3F7FC';Soft='#DCE9F8';Hover='#C9DDF3';Selected='#AFCDEB';Primary='#174F8A';OnPrimary='#FFFFFF';Text='#16324A';Muted='#61788B';Border='#B8CCE0';Accent='#3982C4';Folder='#DCE9F8'}
+    amber=@{Window='#FFF8EB';Surface='#FFFEFB';Card='#FFF3D9';Soft='#F8E5B8';Hover='#F2D996';Selected='#EBC96F';Primary='#9A5700';OnPrimary='#FFFFFF';Text='#3D2A12';Muted='#846B49';Border='#DEC58F';Accent='#D88914';Folder='#F8E5B8'}
+    violet=@{Window='#F7F3FF';Surface='#FFFFFF';Card='#F4EEFF';Soft='#E7DCF8';Hover='#DACAF1';Selected='#C7AFE9';Primary='#5B348C';OnPrimary='#FFFFFF';Text='#312442';Muted='#746384';Border='#CDBCE0';Accent='#8659B9';Folder='#E7DCF8'}
+    cyan=@{Window='#EFFAFA';Surface='#FFFFFF';Card='#EDFAF9';Soft='#D4EFEC';Hover='#BFE3DF';Selected='#9ED4CE';Primary='#126A70';OnPrimary='#FFFFFF';Text='#173B3D';Muted='#5D7C7C';Border='#ADD1CE';Accent='#29939A';Folder='#D4EFEC'}
 }
 $script:themeLabels = @{
-    en=@('Black & white','Clay & rose','Beige & green','White & blue');ru=@('Чёрно-белая','Глина и роза','Бежево-зелёная','Бело-синяя');zh=@('黑白','陶土与玫瑰','米色与绿色','白色与蓝色');fr=@('Noir et blanc','Terre et rose','Beige et vert','Blanc et bleu');ja=@('モノクロ','クレイ＆ローズ','ベージュ＆グリーン','ホワイト＆ブルー');de=@('Schwarz & Weiß','Ton & Rosé','Beige & Grün','Weiß & Blau');es=@('Blanco y negro','Arcilla y rosa','Beige y verde','Blanco y azul')
+    en=@('Black & white','Red','Green','Blue','Orange','Violet','Cyan');ru=@('Чёрно-белая','Красная','Зелёная','Синяя','Оранжевая','Фиолетовая','Бирюзовая');zh=@('黑白','红色','绿色','蓝色','橙色','紫色','青色');fr=@('Noir et blanc','Rouge','Vert','Bleu','Orange','Violet','Cyan');ja=@('モノクロ','レッド','グリーン','ブルー','オレンジ','バイオレット','シアン');de=@('Schwarz & Weiß','Rot','Grün','Blau','Orange','Violett','Cyan');es=@('Blanco y negro','Rojo','Verde','Azul','Naranja','Violeta','Cian')
 }
 
 $script:historyI18n = @{
@@ -198,11 +206,11 @@ function Get-VideoThumbnail([string]$path) {
         $cacheFolder=Join-Path ([IO.Path]::GetTempPath()) 'MediaForge\previews'
         [void](New-Item -ItemType Directory -Path $cacheFolder -Force)
         $hash=[Security.Cryptography.SHA256]::Create()
-        try{$keyBytes=[Text.Encoding]::UTF8.GetBytes("cover-v2|$($info.FullName)|$($info.Length)|$($info.LastWriteTimeUtc.Ticks)");$key=([BitConverter]::ToString($hash.ComputeHash($keyBytes))).Replace('-','').ToLowerInvariant()}finally{$hash.Dispose()}
+        try{$keyBytes=[Text.Encoding]::UTF8.GetBytes("first-frame-v3|$($info.FullName)|$($info.Length)|$($info.LastWriteTimeUtc.Ticks)");$key=([BitConverter]::ToString($hash.ComputeHash($keyBytes))).Replace('-','').ToLowerInvariant()}finally{$hash.Dispose()}
         $thumbnailPath=Join-Path $cacheFolder ($key+'.jpg')
         if(Test-Path -LiteralPath $thumbnailPath){return $thumbnailPath}
         $start=New-Object Diagnostics.ProcessStartInfo;$start.FileName=$ffmpeg.Source
-        $start.Arguments="-hide_banner -loglevel error -y -i `"$path`" -map 0:v:0 -frames:v 1 -vf `"scale=320:180:force_original_aspect_ratio=increase,crop=320:180`" -q:v 3 `"$thumbnailPath`""
+        $start.Arguments="-hide_banner -loglevel error -y -i `"$path`" -map 0:v:0 -an -sn -frames:v 1 -vf `"scale=320:180:force_original_aspect_ratio=increase,crop=320:180`" -q:v 3 `"$thumbnailPath`""
         $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardError=$true
         $process=New-Object Diagnostics.Process;$process.StartInfo=$start;[void]$process.Start()
         if(-not $process.WaitForExit(12000)){try{$process.Kill()}catch{};$process.Dispose();return $null}
@@ -210,6 +218,11 @@ function Get-VideoThumbnail([string]$path) {
         if(Test-Path -LiteralPath $thumbnailPath){return $thumbnailPath}
     } catch {}
     return $null
+}
+
+function New-CachedImageSource([string]$path) {
+    if(-not $path -or -not(Test-Path -LiteralPath $path)){return $null}
+    try{$bitmap=New-Object Windows.Media.Imaging.BitmapImage;$bitmap.BeginInit();$bitmap.CacheOption='OnLoad';$bitmap.DecodePixelWidth=320;$bitmap.UriSource=[uri]$path;$bitmap.EndInit();$bitmap.Freeze();return $bitmap}catch{return $null}
 }
 
 function Get-VideoResolution([string]$path) {
@@ -234,15 +247,21 @@ function New-FileNode([string]$path) {
     if(-not $category){return $null}
     $info = Get-Item -LiteralPath $path
     $extension = $info.Extension.TrimStart('.').ToUpperInvariant()
-    $thumbnail=if($category -eq 'image'){$info.FullName}elseif($category -eq 'video'){Get-VideoThumbnail $info.FullName}else{$null}
-    $resolution=if($category -eq 'video'){Get-VideoResolution $info.FullName}else{''}
+    $analysis=if(Get-Command Invoke-MediaProbe -ErrorAction SilentlyContinue){Invoke-MediaProbe $info.FullName}else{$null}
+    $thumbnailPath=if($category -eq 'image'){$info.FullName}elseif($category -eq 'video'){Get-VideoThumbnail $info.FullName}else{$null}
+    $thumbnail=if($category -eq 'video'){New-CachedImageSource $thumbnailPath}else{$thumbnailPath}
+    $resolution=if($analysis -and $analysis.HasVideo){"$($analysis.Width) × $($analysis.Height)"}elseif($category -eq 'video'){Get-VideoResolution $info.FullName}else{''}
+    $fileInfo=if($analysis){
+        $duration=[TimeSpan]::FromSeconds($analysis.Duration).ToString('hh\:mm\:ss\.fff');$fps=if($analysis.HasVideo){[Math]::Round($analysis.Fps,2)}else{'—'}
+        "Name: $($info.Name)`nContainer: $($analysis.Container)`nVideo: $($analysis.VideoCodec) · $resolution · $fps FPS`nAudio: $($analysis.AudioCodec) · $($analysis.SampleRate) Hz · $($analysis.Channels) channels`nDuration: $duration`nBitrate: $([Math]::Round($analysis.Bitrate/1000)) kbps`nSize: $(Format-Size $info.Length)"
+    }else{"Name: $($info.Name)`nSize: $(Format-Size $info.Length)"}
     $categoryLabel=Get-CategoryLabel $category
     return [pscustomobject]@{
         Name=$info.Name; DisplayName=(Get-ShortName $info.Name); Category=$category; Extension=$extension
         Details=$categoryLabel; Size=(Format-Size $info.Length); Bytes=$info.Length; Path=$info.FullName
-        Thumbnail=$thumbnail; Resolution=$resolution; IsImage=($category -eq 'image'); IsVideo=($category -eq 'video'); IsAudio=($category -eq 'audio')
+        Thumbnail=$thumbnail; ThumbnailPath=$thumbnailPath; Resolution=$resolution; Analysis=$analysis; FileInfo=$fileInfo; Progress=0; ProcessStatus=''; ResultSize=''; IsImage=($category -eq 'image'); IsVideo=($category -eq 'video'); IsAudio=($category -eq 'audio')
         AudioVariant=$(if($category -eq 'audio'){Get-Random -Minimum 1 -Maximum 4}else{0})
-        IsFolder=$false; Children=$null; Number=''; FolderFormat=$null; FolderFormats=@{}; IsMarked=$false; DeleteTooltip=(T 'deleteItem'); AddToFolderTooltip=''
+        IsFolder=$false; IsToolVisible=$true; Children=$null; Number=''; FolderFormat=$null; FolderFormats=@{}; IsMarked=$false; DeleteTooltip=(T 'deleteItem'); AddToFolderTooltip=''
         CategoryDisplay=$categoryLabel;TypeLine="$(T 'typeLabel'): $categoryLabel";FormatLine="$(T 'formatLabel'): $extension";NameLine="$(T 'nameLabel'): $($info.Name)"
     }
 }
@@ -250,8 +269,8 @@ function New-FileNode([string]$path) {
 function New-FolderNode([string]$name) {
     return [pscustomobject]@{
         Name=$name; DisplayName=(Get-ShortName $name); Category='folderType'; Extension='—'; Details=(T 'emptyFolder')
-        Size=''; Path=$null; Thumbnail=$null; Resolution=''; IsImage=$false; IsVideo=$false; IsAudio=$false; AudioVariant=0; IsFolder=$true
-        Children=(New-Object System.Collections.ObjectModel.ObservableCollection[object]); Number=''; FolderFormat=$null; FolderFormats=@{}; IsMarked=$false; DeleteTooltip=(T 'deleteItem'); AddToFolderTooltip=(T 'addToFolder')
+        Size=''; Path=$null; Thumbnail=$null; ThumbnailPath=$null; Resolution=''; Analysis=$null; FileInfo=''; Progress=0; ProcessStatus=''; ResultSize=''; IsImage=$false; IsVideo=$false; IsAudio=$false; AudioVariant=0; IsFolder=$true
+        Children=(New-Object System.Collections.ObjectModel.ObservableCollection[object]); IsToolVisible=$true; Number=''; FolderFormat=$null; FolderFormats=@{}; IsMarked=$false; DeleteTooltip=(T 'deleteItem'); AddToFolderTooltip=(T 'addToFolder')
     }
 }
 
@@ -361,6 +380,7 @@ function Update-UI {
     $FileList.Items.Refresh()
     $GalleryItems.Items.Refresh()
     Update-HistoryButtons
+    Update-ToolSummary
 }
 
 function Apply-ViewMode {
@@ -368,20 +388,82 @@ function Apply-ViewMode {
     $GalleryView.Visibility=if($script:viewMode -eq 'gallery'){'Visible'}else{'Collapsed'}
 }
 
+function Update-ToolSummary {
+    if($script:activeTool -eq 'convert'){return}
+    $count=@($files).Count
+    $ConvertButton.Content=if($script:activeTool -eq 'frame'){if($count -eq 1){'Save frame'}else{"Save $count frames"}}else{if($count -eq 1){'Process file'}else{"Process $count files"}}
+    if(-not $count){$StatusText.Text='Add media to begin';return}
+    $first=@($files)[0];$a=$first.Analysis
+    switch($script:activeTool) {
+        'compress' {$target=0.0;[double]::TryParse($TargetSizeBox.Text,[ref]$target)|Out-Null;$StatusText.Text=if($script:compressionMode -eq 'target'){"$($first.Size) → about $target MB"}else{"Compression: $($CompressionLevelPicker.SelectedItem)"}}
+        'video' {$origin=if($a -and $a.HasVideo){"$($a.Width) × $($a.Height), $([Math]::Round($a.Fps,2)) FPS"}else{'Video settings'};$StatusText.Text="$origin → $($ResolutionPicker.SelectedItem), $($FpsPicker.SelectedItem)"}
+        'audio' {$StatusText.Text="Audio: $($AudioModePicker.SelectedItem)"}
+        'frame' {$StatusText.Text="Frame at $($FrameTimestampBox.Text)"}
+    }
+}
+
+function Test-ToolAcceptsCategory([string]$category,[string]$tool=$script:activeTool) {
+    switch($tool){'compress'{return $category -eq 'video'}'video'{return $category -eq 'video'}'frame'{return $category -eq 'video'}'audio'{return $category -in @('video','audio')}default{return $category -in @('image','video','audio')}}
+}
+
+function Update-ToolVisibility($collection=$nodes) {
+    foreach($item in @($collection)) {
+        if($item.IsFolder){$item.IsToolVisible=$true;Update-ToolVisibility $item.Children}
+        else{$item.IsToolVisible=Test-ToolAcceptsCategory $item.Category}
+    }
+    $FileList.Items.Refresh();$GalleryItems.Items.Refresh()
+}
+
+function Update-ToolMediaCaption {
+    $russian=$script:language -eq 'ru'
+    switch($script:activeTool) {
+        'audio' {$FilesCaption.Text=if($russian){'ВИДЕО И АУДИО'}else{'VIDEO AND AUDIO'};$EmptyAddText.Text=if($russian){'Добавьте видео или аудиофайл'}else{'Drop video or audio here'}}
+        'video' {$FilesCaption.Text=if($russian){'ТОЛЬКО ВИДЕО'}else{'VIDEO ONLY'};$EmptyAddText.Text=if($russian){'Добавьте видео'}else{'Drop video here'}}
+        'compress' {$FilesCaption.Text=if($russian){'ТОЛЬКО ВИДЕО'}else{'VIDEO ONLY'};$EmptyAddText.Text=if($russian){'Добавьте видео для сжатия'}else{'Drop video to compress'}}
+        'frame' {$FilesCaption.Text=if($russian){'ТОЛЬКО ВИДЕО'}else{'VIDEO ONLY'};$EmptyAddText.Text=if($russian){'Добавьте видео для получения кадра'}else{'Drop video to extract a frame'}}
+        default {$FilesCaption.Text=T 'files';$EmptyAddText.Text=T 'empty'}
+    }
+}
+
+function Set-ActiveTool([string]$tool) {
+    $script:activeTool=$tool
+    $map=@{convert=$ConvertTab;compress=$CompressTab;video=$VideoTab;audio=$AudioTab;frame=$FrameTab}
+    foreach($key in $map.Keys){$map[$key].Tag=''}
+    $map[$tool].Tag='Active'
+    $ToolSettingsHost.Visibility=if($tool -eq 'convert'){'Collapsed'}else{'Visible'}
+    $CompressPanel.Visibility=if($tool -eq 'compress'){'Visible'}else{'Collapsed'};$VideoPanel.Visibility=if($tool -eq 'video'){'Visible'}else{'Collapsed'};$AudioPanel.Visibility=if($tool -eq 'audio'){'Visible'}else{'Collapsed'};$FramePanel.Visibility=if($tool -eq 'frame'){'Visible'}else{'Collapsed'}
+    $BulkPanel.Visibility=if($tool -eq 'convert'){'Visible'}else{'Collapsed'};$ConversionScrollViewer.Visibility=if($tool -eq 'convert'){'Visible'}else{'Collapsed'}
+    $ConversionHeaderText.Text=if($tool -eq 'convert'){T 'conversion'}else{'Review and process'}
+    $ConvertButton.Content=if($tool -eq 'convert'){T 'convert'}else{'Process files'}
+    Update-ToolVisibility;Update-ToolMediaCaption
+    Update-ToolSummary
+}
+
+function Initialize-ToolControls {
+    foreach($value in 'Light','Balanced','Strong','Maximum'){[void]$CompressionLevelPicker.Items.Add($value)};$CompressionLevelPicker.SelectedItem='Balanced'
+    foreach($value in 'Original','2160p','1440p','1080p','720p','480p','Custom'){[void]$ResolutionPicker.Items.Add($value)};$ResolutionPicker.SelectedItem='Original'
+    foreach($value in 'Original','24 FPS','25 FPS','30 FPS','50 FPS','60 FPS','Custom'){[void]$FpsPicker.Items.Add($value)};$FpsPicker.SelectedItem='Original'
+    foreach($value in 'Adjust volume','Extract audio','Remove audio'){[void]$AudioModePicker.Items.Add($value)};$AudioModePicker.SelectedIndex=0
+    foreach($value in 'MP3','WAV','AAC','FLAC','M4A','OGG'){[void]$AudioFormatPicker.Items.Add($value)};$AudioFormatPicker.SelectedItem='MP3'
+    foreach($value in 'High','Balanced','Small size'){[void]$AudioQualityPicker.Items.Add($value)};$AudioQualityPicker.SelectedItem='Balanced'
+    foreach($value in 'PNG','JPG','WEBP'){[void]$FrameFormatPicker.Items.Add($value)};$FrameFormatPicker.SelectedItem='PNG'
+}
+
 function Apply-Language {
     $script:updatingPreferences=$true
     try {
-        $TaglineText.Text=T 'tagline';$ThemeCaption.Text=T 'theme';$LanguageCaption.Text=T 'language';$FilesCaption.Text=T 'files'
+        $ThemeCaption.Text=T 'theme';$LanguageCaption.Text=T 'language';$FilesCaption.Text=T 'files'
         $AddMoreButton.ToolTip=T 'addMore';$AddMoreText.Text=T 'addMedia';$EmptyAddText.Text=T 'empty';$FolderButtonText.Text=T 'folder';$RenameButton.Content=T 'rename';$UndoButton.ToolTip=T 'undo';$RedoButton.ToolTip=T 'redo'
         $ConversionHeaderText.Text=T 'conversion';$StatusText.Text=T 'statusDefault';$ConvertButton.Content=T 'convert'
         $GlobalImageLabel.Text=T 'allImages';$GlobalVideoLabel.Text=T 'allVideos';$GlobalAudioLabel.Text=T 'allAudio'
-        $labels=$script:themeLabels[$script:language];$themeKeys=@('mono','editorial','grove','cobalt');$primary=@('#111111','#7B292C','#36533C','#174F8A');$secondary=@('#FFFFFF','#F6DDE3','#F1EBDD','#FFFFFF');$secondaryBorder=@('#D5D5D0','#E8C7CF','#D3C9B4','#B8CCE0')
-        $ThemePicker.Items.Clear();for($index=0;$index -lt 4;$index++){[void]$ThemePicker.Items.Add([pscustomobject]@{Key=$themeKeys[$index];Label=$labels[$index];Primary=$primary[$index];Secondary=$secondary[$index];SecondaryBorder=$secondaryBorder[$index]})};$ThemePicker.SelectedIndex=[Array]::IndexOf($themeKeys,$script:theme)
+        $labels=$script:themeLabels[$script:language];$themeKeys=@($script:themes.Keys)
+        $ThemePicker.Items.Clear();for($index=0;$index -lt $themeKeys.Count;$index++){$palette=$script:themes[$themeKeys[$index]];[void]$ThemePicker.Items.Add([pscustomobject]@{Key=$themeKeys[$index];Label=$labels[$index];Primary=$palette.Primary;Secondary=$palette.Surface;SecondaryBorder=$palette.Border})};$ThemePicker.SelectedIndex=[Array]::IndexOf($themeKeys,$script:theme)
         $ViewPicker.Items.Clear();[void]$ViewPicker.Items.Add((T 'listView'));[void]$ViewPicker.Items.Add((T 'galleryView'));$ViewPicker.SelectedIndex=if($script:viewMode -eq 'gallery'){1}else{0}
         $LanguagePicker.Items.Clear();foreach($choice in $script:languageChoices){[void]$LanguagePicker.Items.Add([string]$choice.Label)}
         $LanguagePicker.SelectedIndex=[Array]::FindIndex([object[]]$script:languageChoices,[Predicate[object]]{param($item)$item.Key -eq $script:language})
         Update-UI
         Apply-ViewMode
+        Update-ToolMediaCaption
     } finally {$script:updatingPreferences=$false}
 }
 
@@ -390,16 +472,20 @@ function Add-Files([string[]]$paths,$targetFolder=$null,[bool]$recordHistory=$tr
     $container=$nodes
     if($targetFolder -and $targetFolder.IsFolder){$container=$targetFolder.Children}
     $added=0
+    $rejected=0
     $newItems=New-Object Collections.Generic.List[object]
     foreach($path in $paths) {
         $resolved=$null
         try{$resolved=(Resolve-Path -LiteralPath $path -ErrorAction Stop).Path}catch{continue}
         if($files | Where-Object Path -eq $resolved){continue}
+        $candidateCategory=Get-Category $resolved
+        if(-not $candidateCategory -or -not(Test-ToolAcceptsCategory $candidateCategory)){$rejected++;continue}
         $item=New-FileNode $resolved
         if($item){$files.Add($item);$container.Add($item);$newItems.Add($item);$added++}
     }
     Update-UI
     if($added){Animate-NewNodes @($newItems);Commit-History $before;$StatusText.Text=TF 'added' @($added)}
+    elseif($rejected){$StatusText.Text=if($script:language -eq 'ru'){'Этот тип файла не поддерживается в выбранной вкладке'}else{'This file type is not supported in the selected tab'}}
     return $added
 }
 
@@ -576,10 +662,16 @@ function Clear-TreeSelection {
     if($selectedContainer){$selectedContainer.IsSelected=$false}
 }
 
+function Get-ActiveMediaDialogFilter {
+    $videoPatterns='*.mp4;*.mov;*.mkv;*.avi;*.webm;*.wmv;*.m4v';$audioPatterns='*.mp3;*.wav;*.flac;*.m4a;*.aac;*.ogg;*.opus;*.wma';$imagePatterns='*.jpg;*.jpeg;*.png;*.webp;*.bmp;*.gif;*.tif;*.tiff;*.avif'
+    $filter=switch($script:activeTool){'audio'{"Video and audio|$videoPatterns;$audioPatterns"}'video'{"Video|$videoPatterns"}'compress'{"Video|$videoPatterns"}'frame'{"Video|$videoPatterns"}default{"$(T 'mediaFilter')|$imagePatterns;$videoPatterns;$audioPatterns"}}
+    return [string]$filter
+}
+
 function Show-FilePicker($targetFolder=$null) {
     $dialog=New-Object Microsoft.Win32.OpenFileDialog
     $dialog.Multiselect=$true
-    $dialog.Filter="$(T 'mediaFilter')|*.jpg;*.jpeg;*.png;*.webp;*.bmp;*.gif;*.tif;*.tiff;*.avif;*.mp4;*.mov;*.mkv;*.avi;*.webm;*.wmv;*.m4v;*.mp3;*.wav;*.flac;*.m4a;*.aac;*.ogg;*.opus;*.wma|$(T 'allFiles')|*.*"
+    $dialog.Filter=Get-ActiveMediaDialogFilter
     if($dialog.ShowDialog()) { Add-Files $dialog.FileNames $targetFolder | Out-Null }
 }
 
@@ -634,7 +726,7 @@ function Show-CreateFolderDialog {
     $box=$dialog.FindName('NameBox');$summary=$dialog.FindName('FileSummary');$dialog.Tag=@()
     $dialog.FindName('AddFiles').Add_Click({
         $picker=New-Object Microsoft.Win32.OpenFileDialog;$picker.Multiselect=$true
-        $picker.Filter="$(T 'mediaFilter')|*.jpg;*.jpeg;*.png;*.webp;*.bmp;*.gif;*.tif;*.tiff;*.avif;*.mp4;*.mov;*.mkv;*.avi;*.webm;*.wmv;*.m4v;*.mp3;*.wav;*.flac;*.m4a;*.aac;*.ogg;*.opus;*.wma|$(T 'allFiles')|*.*"
+        $picker.Filter=Get-ActiveMediaDialogFilter
         if($picker.ShowDialog()){$dialog.Tag=$picker.FileNames;$summary.Text=TF 'selected' @($picker.FileNames.Count)}
     })
     $dialog.FindName('Cancel').Add_Click({$dialog.DialogResult=$false})
@@ -731,9 +823,10 @@ function Remove-SelectedListItems {
 
 $FileList.AddHandler([Windows.Controls.Button]::ClickEvent,[Windows.RoutedEventHandler]{param($sender,$event)
     $button=Find-VisualAncestor $event.OriginalSource ([Windows.Controls.Button])
-    if(-not $button -or @('RowDeleteButton','FolderAddButton') -notcontains $button.Name){return}
+    if(-not $button -or @('RowDeleteButton','FolderAddButton','FileInfoButton') -notcontains $button.Name){return}
     $container=Get-TreeItemFromSource $button
     if(-not $container -or -not $container.Header){return}
+    if($button.Name -eq 'FileInfoButton'){[Windows.MessageBox]::Show([string]$container.Header.FileInfo,'File info','OK','Information')|Out-Null;$event.Handled=$true;return}
     if($button.Name -eq 'FolderAddButton'){$container.IsExpanded=$true;Show-FilePicker $container.Header;$event.Handled=$true;return}
     $before=Get-StateSnapshot;$target=$container.Header;Remove-LogicalFiles $target;[void](Remove-VisualNode $nodes $target)
     Clear-MarkedItems;$script:selectionAnchor=$null;Update-UI;Commit-History $before;$StatusText.Text=TF 'excluded' @(1);$event.Handled=$true
@@ -776,7 +869,7 @@ $FileList.AddHandler([Windows.Controls.TreeViewItem]::ExpandedEvent,[Windows.Rou
 $ListSurface.Add_PreviewMouseLeftButtonDown({param($sender,$event)
     $pressedButton=Find-VisualAncestor $event.OriginalSource ([Windows.Controls.Button])
     if($pressedButton -and $pressedButton.Name -eq 'FolderAddButton'){$folderContainer=Get-TreeItemFromSource $pressedButton;if($folderContainer -and $folderContainer.Header){$folderContainer.ItemsSource=$folderContainer.Header.Children;$folderContainer.IsExpanded=$true;$event.Handled=$true;Show-FilePicker $folderContainer.Header};return}
-    if($pressedButton -and $pressedButton.Name -eq 'RowDeleteButton'){return}
+    if($pressedButton -and @('RowDeleteButton','FileInfoButton') -contains $pressedButton.Name){return}
     $container=Get-TreeItemFromSource $event.OriginalSource
     if(-not $container){Clear-TreeSelection;Clear-MarkedItems;Refresh-FileSelection;$script:selectionAnchor=$null;$script:dragItem=$null;if($event.ClickCount -eq 2){Show-FilePicker};return}
     $item=$container.Header;$script:dragStart=$event.GetPosition($FileList);$script:dragItem=$item
@@ -787,6 +880,13 @@ $ListSurface.Add_PreviewMouseLeftButtonDown({param($sender,$event)
     $container.IsSelected=$true;[void]$container.Focus()
     $toggle=Find-VisualAncestor $event.OriginalSource ([Windows.Controls.Primitives.ToggleButton])
     if($item.IsFolder -and -not $toggle -and $modifiers -eq [Windows.Input.ModifierKeys]::None){$container.ItemsSource=$item.Children;$container.IsExpanded=-not $container.IsExpanded;$event.Handled=$true}
+})
+
+$ListSurface.Add_PreviewMouseLeftButtonUp({param($sender,$event)
+    $button=Find-VisualAncestor $event.OriginalSource ([Windows.Controls.Button])
+    if(-not $button -or $button.Name -ne 'FileInfoButton'){return}
+    $container=Get-TreeItemFromSource $button
+    if($container -and $container.Header -and -not $container.Header.IsFolder){[Windows.MessageBox]::Show([string]$container.Header.FileInfo,'File info','OK','Information')|Out-Null;$event.Handled=$true}
 })
 
 $ListSurface.Add_PreviewMouseMove({param($sender,$event)
@@ -909,7 +1009,76 @@ $GlobalImagePicker.Add_SelectionChanged({Apply-GlobalFormat 'image' $GlobalImage
 $GlobalVideoPicker.Add_SelectionChanged({Apply-GlobalFormat 'video' $GlobalVideoPicker})
 $GlobalAudioPicker.Add_SelectionChanged({Apply-GlobalFormat 'audio' $GlobalAudioPicker})
 
+function Get-CurrentProcessSpec {
+    $spec=New-MediaProcessSpec;$spec.Mode=$script:activeTool
+    if($script:activeTool -eq 'compress') {
+        $spec.CompressionMode=$script:compressionMode;$target=25.0
+        [double]::TryParse($TargetSizeBox.Text,[Globalization.NumberStyles]::Float,[Globalization.CultureInfo]::CurrentCulture,[ref]$target)|Out-Null
+        $spec.TargetSizeMB=[Math]::Max(1,$target);$spec.CompressionLevel=[string]$CompressionLevelPicker.SelectedItem
+        $spec.Resolution=[string]$ResolutionPicker.SelectedItem;$spec.Fps=if([string]$FpsPicker.SelectedItem -eq 'Custom'){"$($CustomFpsBox.Text) FPS"}else{[string]$FpsPicker.SelectedItem};$spec.Speed=[double]$SpeedSlider.Value;$spec.KeepAspect=[bool]$KeepAspectCheck.IsChecked
+        [int]$width=0;[int]$height=0;[int]::TryParse($CustomWidthBox.Text,[ref]$width)|Out-Null;[int]::TryParse($CustomHeightBox.Text,[ref]$height)|Out-Null;$spec.CustomWidth=$width;$spec.CustomHeight=$height
+        $spec.Volume=[double]$VolumeSlider.Value;$spec.Normalize=[bool]$NormalizeCheck.IsChecked;if($RemoveAudioCheck.IsChecked){$spec.AudioMode='remove'}
+    } elseif($script:activeTool -eq 'video') {
+        $spec.Resolution=[string]$ResolutionPicker.SelectedItem;$spec.Fps=if([string]$FpsPicker.SelectedItem -eq 'Custom'){"$($CustomFpsBox.Text) FPS"}else{[string]$FpsPicker.SelectedItem};$spec.Speed=[double]$SpeedSlider.Value;$spec.KeepAspect=[bool]$KeepAspectCheck.IsChecked
+        [int]$width=0;[int]$height=0;[int]::TryParse($CustomWidthBox.Text,[ref]$width)|Out-Null;[int]::TryParse($CustomHeightBox.Text,[ref]$height)|Out-Null;$spec.CustomWidth=$width;$spec.CustomHeight=$height
+        $spec.Volume=[double]$VolumeSlider.Value;$spec.Normalize=[bool]$NormalizeCheck.IsChecked
+        if($RemoveAudioCheck.IsChecked){$spec.AudioMode='remove'}
+    } elseif($script:activeTool -eq 'audio') {
+        switch([string]$AudioModePicker.SelectedItem){'Extract audio'{$spec.AudioMode='extract'}'Remove audio'{$spec.AudioMode='remove'}default{$spec.AudioMode='keep'}}
+        $spec.AudioFormat=[string]$AudioFormatPicker.SelectedItem;$spec.AudioQuality=[string]$AudioQualityPicker.SelectedItem;$manualBitrate=0;[int]::TryParse($AudioBitrateBox.Text,[ref]$manualBitrate)|Out-Null;$spec.AudioBitrate=$manualBitrate;$spec.Volume=[double]$VolumeSlider.Value;$spec.Normalize=[bool]$NormalizeCheck.IsChecked
+    } elseif($script:activeTool -eq 'frame') {
+        $spec.FrameTimestamp=$FrameTimestampBox.Text.Trim();$spec.FrameFormat=[string]$FrameFormatPicker.SelectedItem;$spec.FrameQuality=[int]$FrameQualitySlider.Value
+    }
+    return $spec
+}
+
+function Start-EnginePass($pass) {
+    $ffmpeg=Get-Command ffmpeg.exe -ErrorAction SilentlyContinue;if(-not $ffmpeg){throw (T 'ffmpegMissing')}
+    $start=New-Object Diagnostics.ProcessStartInfo;$start.FileName=$ffmpeg.Source;$start.Arguments=$pass.Arguments
+    $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardError=$true
+    $process=New-Object Diagnostics.Process;$process.StartInfo=$start;[void]$process.Start();return $process
+}
+
+function Start-ToolProcessing {
+    if(-not $files.Count){return}
+    if(-not(Get-Command New-FFmpegPlan -ErrorAction SilentlyContinue)){throw 'Media processing engine is unavailable.'}
+    $spec=Get-CurrentProcessSpec
+    $eligible=@($files|Where-Object{if($script:activeTool -in @('video','compress','frame')){$_.IsVideo}elseif($script:activeTool -eq 'audio'){$_.IsVideo -or $_.IsAudio}else{$true}})
+    if(-not $eligible.Count){$StatusText.Text='This tool needs a video file';return}
+    $outputRoot=Join-Path $appRoot 'ready convertation';[void](New-Item -ItemType Directory -Path $outputRoot -Force)
+    $outputFolder=Unique-FolderPath $outputRoot ((Get-Date -Format 'dd.MM')+' '+$script:activeTool);[void](New-Item -ItemType Directory -Path $outputFolder -Force)
+    $jobs=New-Object Collections.Generic.List[object]
+    foreach($file in $eligible) {
+        $analysis=if($file.Analysis){$file.Analysis}else{Invoke-MediaProbe $file.Path};if(-not $analysis){$file.ProcessStatus='Analysis failed';continue}
+        $extension=Get-EngineOutputExtension $spec $file.Path;$base=[IO.Path]::GetFileNameWithoutExtension($file.Name)
+        $output=Unique-Path $outputFolder $base $extension;$passLog=Join-Path $outputFolder ('.pass-'+[guid]::NewGuid().ToString('N'))
+        $plan=New-FFmpegPlan $spec $analysis $file.Path $output $passLog
+        $jobs.Add([pscustomobject]@{File=$file;Plan=$plan;PassIndex=0;Process=$null;Error='';PassLog=$passLog})
+        $file.Progress=0;$file.ProcessStatus='Queued';$file.ResultSize=''
+    }
+    if(-not $jobs.Count){return}
+    $script:toolState=[pscustomobject]@{Jobs=$jobs;Index=0;Errors=0;Folder=$outputFolder;Timer=$null}
+    $ConvertButton.IsEnabled=$false;$ConvertButton.Content='Processing…';$FileList.Items.Refresh()
+    $timer=New-Object Windows.Threading.DispatcherTimer;$script:toolState.Timer=$timer;$timer.Interval=[TimeSpan]::FromMilliseconds(160)
+    $timer.Add_Tick({
+        $state=$script:toolState;$job=$state.Jobs[$state.Index];$file=$job.File
+        if($null -eq $job.Process){
+            try{$file.ProcessStatus=if($job.Plan.Passes.Count -gt 1){"Pass $($job.PassIndex+1)/$($job.Plan.Passes.Count)"}else{'Processing'};$job.Process=Start-EnginePass $job.Plan.Passes[$job.PassIndex];$FileList.Items.Refresh();$StatusText.Text="Processing $($state.Index+1) / $($state.Jobs.Count): $($file.Name)"}catch{$job.Error=$_.Exception.Message}
+        }
+        if($job.Process -and -not $job.Process.HasExited){$file.Progress=[Math]::Min(92,$file.Progress+1);if(($file.Progress%4)-eq 0){$FileList.Items.Refresh()};return}
+        if($job.Process){$errorText=$job.Process.StandardError.ReadToEnd();if($job.Process.ExitCode -ne 0){$job.Error=$errorText};$job.Process.Dispose();$job.Process=$null}
+        if(-not $job.Error -and $job.PassIndex+1 -lt $job.Plan.Passes.Count){$job.PassIndex++;$file.Progress=[Math]::Max($file.Progress,50);return}
+        if($job.Error){$file.ProcessStatus='Failed';$state.Errors++}else{$file.Progress=100;$file.ProcessStatus='Completed';$out=$job.Plan.Passes[-1].Output;if($out -and (Test-Path -LiteralPath $out)){$file.ResultSize=Format-Size (Get-Item -LiteralPath $out).Length}}
+        foreach($suffix in '-0.log','-0.log.mbtree','.log','.log.mbtree'){try{Remove-Item -LiteralPath ($job.PassLog+$suffix) -ErrorAction SilentlyContinue}catch{}}
+        $state.Index++;$FileList.Items.Refresh()
+        if($state.Index -lt $state.Jobs.Count){return}
+        $state.Timer.Stop();$ConvertButton.IsEnabled=$true;$ConvertButton.Content=if($state.Errors){'Process again'}else{'Completed'}
+        $StatusText.Text=if($state.Errors){"Completed with $($state.Errors) failed files"}else{"$($state.Jobs.Count) files successfully processed"}
+    });$timer.Start()
+}
+
 $ConvertButton.Add_Click({
+    if($script:activeTool -ne 'convert'){Start-ToolProcessing;return}
     if(-not(Get-Command ffmpeg.exe -ErrorAction SilentlyContinue)){[Windows.MessageBox]::Show((T 'ffmpegMissing'),'Media Forge')|Out-Null;return}
     $outputRoot=Join-Path $appRoot 'ready convertation';[void](New-Item -ItemType Directory -Path $outputRoot -Force)
     $outputFolder=Unique-FolderPath $outputRoot (Get-Date -Format 'dd.MM');[void](New-Item -ItemType Directory -Path $outputFolder -Force)
@@ -940,6 +1109,44 @@ $LanguagePicker.Add_SelectionChanged({
     Apply-Language;Save-Preferences
 })
 
+function Update-FramePreview {
+    $file=@($files|Where-Object IsVideo|Select-Object -First 1)[0];if(-not $file){return}
+    try {
+        $cache=Join-Path ([IO.Path]::GetTempPath()) 'MediaForge\frame-preview';[void](New-Item -ItemType Directory -Path $cache -Force)
+        $key=([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("$($file.Path)|$($FrameTimestampBox.Text)"))).Replace('/','_').Replace('+','-').TrimEnd('=')
+        if($key.Length -gt 80){$key=$key.Substring($key.Length-80)};$path=Join-Path $cache ($key+'.jpg')
+        if(-not(Test-Path -LiteralPath $path)){$spec=New-MediaProcessSpec;$spec.Mode='frame';$spec.FrameTimestamp=$FrameTimestampBox.Text;$spec.FrameFormat='JPG';$spec.FrameQuality=82;$plan=New-FFmpegPlan $spec $file.Analysis $file.Path $path (Join-Path $cache 'preview-pass');$process=Start-EnginePass $plan.Passes[0];$process.WaitForExit(10000)|Out-Null;$process.Dispose()}
+        if(Test-Path -LiteralPath $path){$bitmap=New-Object Windows.Media.Imaging.BitmapImage;$bitmap.BeginInit();$bitmap.CacheOption='OnLoad';$bitmap.UriSource=[uri]$path;$bitmap.EndInit();$bitmap.Freeze();$FramePreview.Background=[Windows.Media.ImageBrush]::new($bitmap);$FramePreview.Background.Stretch='UniformToFill'}
+    } catch {}
+}
+
+$ConvertTab.Add_Click({Set-ActiveTool 'convert'});$CompressTab.Add_Click({Set-ActiveTool 'compress'});$VideoTab.Add_Click({Set-ActiveTool 'video'});$AudioTab.Add_Click({Set-ActiveTool 'audio'});$FrameTab.Add_Click({Set-ActiveTool 'frame'})
+foreach($entry in @(@($Compress10Button,10),@($Compress25Button,25),@($Compress50Button,50),@($Compress100Button,100))){$button=$entry[0];$value=$entry[1];$button.Add_Click([Windows.RoutedEventHandler]{param($sender,$event)$script:compressionMode='target';$TargetSizeBox.Text=[string]$sender.Content.Replace(' MB','');Update-ToolSummary})}
+$CompressionLevelPicker.Add_SelectionChanged({if($CompressionLevelPicker.SelectedItem){$script:compressionMode='level';Update-ToolSummary}})
+$TargetSizeBox.Add_TextChanged({if($TargetSizeBox.IsKeyboardFocused){$script:compressionMode='target';Update-ToolSummary}})
+$ResolutionPicker.Add_SelectionChanged({$CustomResolutionPanel.Visibility=if([string]$ResolutionPicker.SelectedItem -eq 'Custom'){'Visible'}else{'Collapsed'};Update-ToolSummary})
+$FpsPicker.Add_SelectionChanged({$CustomFpsBox.Visibility=if([string]$FpsPicker.SelectedItem -eq 'Custom'){'Visible'}else{'Collapsed'};Update-ToolSummary})
+$SpeedSlider.Add_ValueChanged({$SpeedValueText.Text=([string]::Format([Globalization.CultureInfo]::InvariantCulture,'{0:0.##}×',$SpeedSlider.Value));Update-ToolSummary})
+$VolumeSlider.Add_ValueChanged({$VolumeValueText.Text="$([Math]::Round($VolumeSlider.Value*100))%";Update-ToolSummary})
+$FrameQualitySlider.Add_ValueChanged({$FrameQualityText.Text="$([Math]::Round($FrameQualitySlider.Value))%"})
+$AudioModePicker.Add_SelectionChanged({
+    $extract=[string]$AudioModePicker.SelectedItem -eq 'Extract audio';$AudioFormatPicker.IsEnabled=$extract;$AudioQualityPicker.IsEnabled=$extract
+    $adjust=[string]$AudioModePicker.SelectedItem -eq 'Adjust volume';$VolumeSlider.IsEnabled=$adjust;$NormalizeCheck.IsEnabled=$adjust;Update-ToolSummary
+})
+$FrameTimeline.Add_ValueChanged({
+    if($script:activeTool -ne 'frame' -or -not $files.Count){return};$analysis=@($files)[0].Analysis;if(-not $analysis -or $analysis.Duration -le 0){return}
+    $seconds=$analysis.Duration*($FrameTimeline.Value/100.0);$time=[TimeSpan]::FromSeconds($seconds);$FrameTimestampBox.Text=('{0:00}:{1:00}:{2:00}.{3:000}' -f [Math]::Floor($time.TotalHours),$time.Minutes,$time.Seconds,$time.Milliseconds)
+})
+$FrameTimeline.Add_PreviewMouseLeftButtonUp({Update-FramePreview})
+$FrameTimestampBox.Add_LostKeyboardFocus({Update-FramePreview})
+$FrameTimestampBox.Add_TextChanged({Update-ToolSummary})
+$CustomWidthBox.Add_LostKeyboardFocus({
+    if(-not $KeepAspectCheck.IsChecked -or -not $files.Count){return};$analysis=@($files)[0].Analysis;if(-not $analysis -or $analysis.Width -le 0){return};$width=0;if([int]::TryParse($CustomWidthBox.Text,[ref]$width)){$CustomHeightBox.Text=[string]([Math]::Max(2,[Math]::Round($width*$analysis.Height/$analysis.Width/2)*2))}
+})
+
+Initialize-ToolControls
+$script:compressionMode='target'
 Apply-Theme
 Apply-Language
+Set-ActiveTool 'convert'
 [void]$window.ShowDialog()
