@@ -1,0 +1,2 @@
+﻿System.InvalidOperationException: Argument types do not match
+   at MediaForgeLauncher.Main()
